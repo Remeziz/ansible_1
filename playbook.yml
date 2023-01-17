@@ -3,34 +3,39 @@
   become: yes
   tasks:
     - name: Install nginx 
-      apt: name=nginx state=latest
+      apt: 
+         name: nginx 
+         state: latest
     - name: Start nginx
       service:
-          name: nginx
-          state: started
-    - name: Install docker
-      ansible.builtin.shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh 
+         name: nginx
+         state: started
+    - name: Install docker 
+      apt: 
+         name: docker.io
+         state: latest
+         update_cache: yes
     - name: Start and enable docker 
       service:
-        name: docker
-        state: started
-        enabled: yes  
-    - name: Add the user 'zelin' with a bash shell, appending the group 'docker' to the user's groups
+         name: docker
+         state: started
+         enabled: yes  
+    - name: Add the user 
       ansible.builtin.user:
-        name: zelin
-        shell: /bin/bash
-        groups: docker
-        append: yes
-    - name: Set authorized key for user zelin
+         name: zelin
+         shell: /bin/bash
+         groups: docker
+         append: yes
+    - name: Set authorized key 
     #please check your type of authorized_key. I use ECDSA  
       ansible.posix.authorized_key:
-       user: zelin
-       state: present
-       key: "{{ lookup('file', '~/.ssh/id_ecdsa.pub') }}"
+         user: zelin
+         state: present
+         key: "{{ lookup('file', '~/.ssh/id_ecdsa.pub') }}"
     - name: Get nginx`s version 
       shell: 
-       cmd: nginx -v 
+         cmd: nginx -v 
       register: nginx_version
     - name: Debug info
       debug: 
-       msg: "{{ nginx_version.stderr }}"
+         msg: "{{ nginx_version.stderr }}"
